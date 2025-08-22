@@ -7,6 +7,8 @@ import { Providers } from '@/components/providers';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
+export const revalidate = 3600;
+
 // This function dynamically generates metadata for the page.
 export async function generateMetadata(): Promise<Metadata> {
   let shopName = 'ShopSwift'; // Default title
@@ -20,7 +22,10 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   return {
-    title: shopName,
+    title: {
+      default: shopName,
+      template: `%s | ${shopName}`
+    },
     description: 'A modern responsive E-commerce web and mobile app.',
   };
 }
