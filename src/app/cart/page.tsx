@@ -7,14 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingCart, Loader2 } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import Link from "next/link";
 import { useStoreSettings } from "@/hooks/use-store-settings";
+import { useState } from "react";
 
 export default function CartPage() {
     const { cartItems, updateQuantity, removeFromCart, clearCart } = useCart();
     const { settings } = useStoreSettings();
+    const [isRedirecting, setIsRedirecting] = useState(false);
 
     const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const shipping = settings.shippingFee;
@@ -68,8 +70,15 @@ export default function CartPage() {
                                     </div>
                                 </CardContent>
                                 <CardFooter>
-                                    <Button size="lg" className="w-full" asChild>
-                                        <Link href="/checkout">Proceed to Checkout</Link>
+                                    <Button size="lg" className="w-full" asChild={!isRedirecting} onClick={() => setIsRedirecting(true)} disabled={isRedirecting}>
+                                        {isRedirecting ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                                <span>Redirecting...</span>
+                                            </>
+                                        ) : (
+                                            <Link href="/checkout">Proceed to Checkout</Link>
+                                        )}
                                     </Button>
                                 </CardFooter>
                             </Card>

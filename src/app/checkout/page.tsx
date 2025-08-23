@@ -16,10 +16,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useOrders } from "@/hooks/use-orders";
-import { CreditCard, Landmark, Truck, Wallet } from "lucide-react";
+import { CreditCard, Landmark, Truck, Wallet, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/hooks/use-user";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useStoreSettings } from "@/hooks/use-store-settings";
 import { FullPageLoader } from "@/components/ui/loader";
 
@@ -40,6 +40,7 @@ export default function CheckoutPage() {
   const { toast } = useToast();
   const router = useRouter();
   const { user, isLoaded } = useUser();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -83,6 +84,7 @@ export default function CheckoutPage() {
   const total = subtotal + shipping;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsProcessing(true);
     const shippingAddress = {
       fullName: values.fullName,
       address: values.address,
@@ -102,6 +104,8 @@ export default function CheckoutPage() {
         });
         clearCart();
         router.push(`/orders/${orderId}`);
+    } else {
+        setIsProcessing(false);
     }
   }
 
@@ -239,9 +243,18 @@ export default function CheckoutPage() {
                     <span>Total</span>
                     <span>{settings.currencySymbol}{total.toFixed(2)}</span>
                   </div>
-                   <Button type="submit" size="lg" className="w-full mt-4 text-base font-bold">
-                        <Truck className="mr-2 h-5 w-5"/>
-                        Place Order
+                   <Button type="submit" size="lg" className="w-full mt-4 text-base font-bold" disabled={isProcessing}>
+                        {isProcessing ? (
+                            <>
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin"/>
+                                Placing Order...
+                            </>
+                        ) : (
+                            <>
+                                <Truck className="mr-2 h-5 w-5"/>
+                                Place Order
+                            </>
+                        )}
                    </Button>
                 </CardContent>
               </Card>
