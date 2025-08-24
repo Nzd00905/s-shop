@@ -45,11 +45,13 @@ export function Header() {
     <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-sm border-b">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {isLoaded ? (
-            <Link href="/" className="text-2xl font-bold font-headline text-foreground">
-                {settings.shopName}
-            </Link>
+          <Link href="/" className="flex items-center gap-2">
+            <span className="text-2xl font-bold font-headline text-foreground">
+              {settings.shopName}
+            </span>
+          </Link>
         ) : (
-            <Skeleton className="h-7 w-32" />
+            <Skeleton className="h-10 w-32" />
         )}
         <div className="flex items-center gap-2">
           <CartButton />

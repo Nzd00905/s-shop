@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -44,7 +45,6 @@ export function ProductImageGallery({ images }: ProductImageGalleryProps) {
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover"
                     data-ai-hint="product detail"
-                    priority={index === 0}
                   />
                 </CardContent>
               </Card>

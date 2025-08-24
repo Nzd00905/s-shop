@@ -1,9 +1,9 @@
 
 'use client';
 
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useUser } from '@/hooks/use-user';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -15,76 +15,80 @@ import Link from 'next/link';
 import { FullPageLoader } from '@/components/ui/loader';
 
 const formSchema = z.object({
-  email: z.string().email('Invalid email address.'),
   password: z.string().min(6, 'Password must be at least 6 characters.'),
+  confirmPassword: z.string()
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 
-function LoginComponent() {
-  const { user, signInWithEmail, isLoaded } = useUser();
-  const router = useRouter();
+function ResetPasswordComponent() {
+  const { confirmPasswordReset } = useUser();
   const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get('redirect') || '/account';
-
+  const oobCode = searchParams.get('oobCode');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
       password: '',
+      confirmPassword: '',
     },
   });
 
-  useEffect(() => {
-    if (isLoaded && user) {
-      router.push(redirectUrl);
-    }
-  }, [user, isLoaded, router, redirectUrl]);
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const success = await signInWithEmail(values.email, values.password);
-    if(success) {
-      router.push(redirectUrl);
+    if (oobCode) {
+      await confirmPasswordReset(oobCode, values.password);
     }
   };
 
-
-  if (!isLoaded || user) {
-    return <FullPageLoader />;
+  if (!oobCode) {
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-muted/40">
+            <Card className="w-full max-w-sm text-center">
+                 <CardHeader>
+                    <CardTitle className="text-2xl">Invalid Link</CardTitle>
+                    <CardDescription>The password reset link is missing or invalid. Please request a new one.</CardDescription>
+                </CardHeader>
+                 <CardContent>
+                    <Button asChild>
+                        <Link href="/forgot-password">Request New Link</Link>
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
+    )
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/40">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Welcome Back!</CardTitle>
-          <CardDescription>Sign in to continue to your account.</CardDescription>
+          <CardTitle className="text-2xl">Reset Your Password</CardTitle>
+          <CardDescription>Enter a new password for your account.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="email"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>New Password</FormLabel>
                     <FormControl>
-                      <Input placeholder="name@example.com" {...field} />
+                      <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormField
+               <FormField
                 control={form.control}
-                name="password"
+                name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <div className='flex justify-between items-end'>
-                      <FormLabel>Password</FormLabel>
-                      <Link href="/forgot-password" passHref className='text-xs text-primary hover:underline'>Forgot Password?</Link>
-                    </div>
+                    <FormLabel>Confirm New Password</FormLabel>
                     <FormControl>
                       <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
@@ -93,26 +97,20 @@ function LoginComponent() {
                 )}
               />
               <Button className="w-full" type="submit">
-                Sign In
+                Set New Password
               </Button>
             </form>
           </Form>
-           <p className="mt-4 text-center text-sm text-muted-foreground">
-              Don&apos;t have an account?{' '}
-              <Link href="/signup" className="font-semibold text-primary hover:underline">
-                Sign up
-              </Link>
-            </p>
         </CardContent>
       </Card>
     </div>
   );
 }
 
-export default function LoginPage() {
-  return (
-    <Suspense fallback={<FullPageLoader />}>
-      <LoginComponent />
-    </Suspense>
-  )
+export default function ResetPasswordPage() {
+    return (
+        <Suspense fallback={<FullPageLoader />}>
+            <ResetPasswordComponent />
+        </Suspense>
+    )
 }

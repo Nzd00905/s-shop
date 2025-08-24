@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -53,7 +54,6 @@ export function PromoBanner({ banners, isLoaded }: PromoBannerProps) {
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover"
                     data-ai-hint={banner.dataAiHint}
-                    priority={index === 0}
                   />
                   <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                     <h2 className="text-3xl md:text-5xl font-bold text-white font-headline drop-shadow-lg">{banner.title}</h2>

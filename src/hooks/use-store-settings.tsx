@@ -13,6 +13,7 @@ const BANNERS_COLLECTION = 'banners';
 
 interface StoreSettings {
     shopName: string;
+    logo: string | null;
     banners: Banner[];
     currencySymbol: string;
     shippingFee: number;
@@ -38,6 +39,7 @@ const initialBanners: Omit<Banner, 'id'>[] = [
 
 const defaultSettings: Omit<StoreSettings, 'banners'> = {
     shopName: 'ShopSwift',
+    logo: null,
     currencySymbol: '$',
     shippingFee: 0,
 }
@@ -87,7 +89,7 @@ export function StoreSettingsProvider({ children }: { children: ReactNode }) {
         fetchSettings();
     }, [fetchSettings]);
 
-    const updateMainSettingsInFirestore = useCallback(async (newSettings: Partial<Omit<StoreSettings, 'banners'>>) => {
+    const updateMainSettingsInFirestore = useCallback(async (newSettings: Partial<Omit<StoreSettings, 'banners' | 'logo'>>) => {
         try {
             const settingsDoc = doc(db, SETTINGS_COLLECTION, SETTINGS_DOC_ID);
             await setDoc(settingsDoc, newSettings, { merge: true });

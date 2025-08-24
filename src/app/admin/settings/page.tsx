@@ -72,7 +72,7 @@ export default function StoreSettingsPage() {
     };
 
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleBannerImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             const reader = new FileReader();
@@ -139,7 +139,7 @@ export default function StoreSettingsPage() {
              <Card>
                 <CardHeader>
                     <CardTitle>Shop Name</CardTitle>
-                    <CardDescription>This is the name that will be displayed to your customers.</CardDescription>
+                    <CardDescription>Customize the name for your shop.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="flex items-end gap-4">
@@ -255,13 +255,13 @@ export default function StoreSettingsPage() {
                                             </Button>
                                         </>
                                     ) : (
-                                        <Label htmlFor="image-upload" className="cursor-pointer flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                                        <Label htmlFor="banner-image-upload" className="cursor-pointer flex flex-col items-center justify-center gap-2 text-muted-foreground">
                                             <Upload className="h-8 w-8" />
                                             <span>Click or drag to upload</span>
                                         </Label>
                                     )}
                                 </div>
-                                <Input id="image-upload" type="file" className="sr-only" onChange={handleImageUpload} accept="image/*" />
+                                <Input id="banner-image-upload" type="file" className="sr-only" onChange={handleBannerImageUpload} accept="image/*" />
                             </div>
                             <Button onClick={handleAddBanner} disabled={!newBannerImage || !newBannerTitle}>Add Banner</Button>
                         </div>

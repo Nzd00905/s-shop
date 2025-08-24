@@ -42,6 +42,7 @@ const nextConfig: NextConfig = {
         ...config.resolve.alias,
         '@opentelemetry/exporter-jaeger': false,
         '@genkit-ai/firebase': false,
+        'firebase-admin': false,
       };
     }
     return config;

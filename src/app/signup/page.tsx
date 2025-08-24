@@ -3,7 +3,7 @@
 
 import { useUser } from '@/hooks/use-user';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Link from 'next/link';
 import { FullPageLoader } from '@/components/ui/loader';
+import { MailCheck } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
@@ -29,6 +30,8 @@ const formSchema = z.object({
 export default function SignUpPage() {
   const { user, signUpWithEmail, isLoaded } = useUser();
   const router = useRouter();
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,13 +51,34 @@ export default function SignUpPage() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const success = await signUpWithEmail(values.name, values.email, values.password);
     if(success) {
-      router.push('/account');
+      setShowVerificationMessage(true);
     }
   };
 
 
   if (!isLoaded || user) {
     return <FullPageLoader />;
+  }
+
+  if (showVerificationMessage) {
+    return (
+       <div className="flex min-h-screen items-center justify-center bg-muted/40">
+            <Card className="w-full max-w-sm text-center">
+                <CardHeader>
+                    <MailCheck className='mx-auto h-16 w-16 text-green-500' />
+                    <CardTitle className="text-2xl mt-4">Check your email</CardTitle>
+                    <CardDescription>
+                        We've sent a verification link to your email address. Please click the link to continue.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                     <Button asChild>
+                        <Link href="/login">Back to Login</Link>
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
+    )
   }
 
   return (
